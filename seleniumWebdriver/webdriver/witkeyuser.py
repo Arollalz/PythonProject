@@ -2,8 +2,8 @@
 import time
 from selenium import webdriver
 import os
-class witkeyuser:
-    def __init__(self, name, password, task_limit_number=10):
+class Witkeyuser:
+    def __init__(self, name, password, task_limit_number=1):
         self.name = name
         self.password = password
         self.task_limit_number = task_limit_number
@@ -31,4 +31,6 @@ class witkeyuser:
             browser.find_element_by_id("questionSubmit").click()
             time.sleep(0.5)
             browser.find_element_by_id("questionSubmit").click()
+            finished_task_num += 1
+            time.sleep(0.5)
         browser.quit()
