@@ -5,13 +5,15 @@ import os
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
-class Witkeyuser:
+import threading
+class Witkeyuser(threading.Thread):
     def __init__(self, name, password, task_limit_number=2):
+        threading.Thread.__init__(self)
         self.name = name
         self.password = password
         self.task_limit_number = task_limit_number
 
-    def checkTask(self):
+    def run(self):
         # chrome
         # chromedriver = os.getcwd()+"\chromedriver.exe"
         # os.environ["webdriver.chrome.driver"] = chromedriver
@@ -19,7 +21,7 @@ class Witkeyuser:
 
         # firefox
         browser = webdriver.Firefox()
-        browser.get("http://172.16.8.5:4031/")
+        browser.get("http://172.16.9.7:4031/")
         #go to login page
         browser.find_element_by_xpath("/html/body/div[1]/div/div/nav/ul/li[2]").click()
         #login with name and password

@@ -3,29 +3,39 @@ import os
 import threading
 
 
-# f = open(os.getcwd()+"\selectWitkeyUserLoginNameAndPassword.csv")
-# print os.getcwd()
-# threads = []
-# for line in f.readlines():
-#     print line
-#     name_password = line.split(',')
-#     print name_password
-#     #create a lock
-#     mutex = threading.Lock()
-#     t = threading.Thread(target=Witkeyuser(name_password[0], name_password[1], 10).checkTask())
-#     threads.append(t)
-# f.close()
-#
-# for t in threads:
-#     t.setDeamon(True)
-#     t.start()
+f = open(os.getcwd()+"\selectWitkeyUserLoginNameAndPassword.csv")
+print os.getcwd()
+threads = []
+for line in f.readlines():
+    if line == "" or line == "\n":
+        break
+    print line
+    name_password = line.split(',')
+    print name_password
 
-# 13438354577
-# 15196775582
-# 18202824902
-# 18602852536
-# 18782967218
-# 13618040690
-# 13096323190
-user = Witkeyuser("18602852536", "123456", 4)
+    t = Witkeyuser(name_password[0], name_password[1], 4)
+    threads.append(t)
+f.close()
+
+for t in threads:
+    t.start()
+for t in threads:
+    t.join()
+
+# 13438354577,123456
+# 18782967218,123456
+# 18583750817,123456
+# 15196775582,123456
+# 18780165474,123456
+# 13618040690,123456
+# 13882162641,123456
+# 13666221984,123456
+# 15882067658,123456
+# 18215679921,123456
+# 18202824902,123456
+# 18602878213,123456
+# 18190790927,123456
+# 18202850095,123456
+# 18675503875,123456
+user = Witkeyuser("13438354577", "123456", 4)
 user.checkTask()
