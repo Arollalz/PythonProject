@@ -21,22 +21,22 @@ class Witkeyuser(threading.Thread):
 
         # firefox
         browser = webdriver.Firefox()
-        browser.get("http://172.16.9.7:4031/")
+        browser.get("http://172.16.8.7:4031/")
+        # browser.get("http://witkey.iclassedu.com/#/")
         #go to login page
         browser.find_element_by_xpath("/html/body/div[1]/div/div/nav/ul/li[2]").click()
         #login with name and password
-        WebDriverWait(browser, 10).until(lambda the_driver: the_driver.find_element_by_xpath("/html/body/div[2]/div[2]/div[2]/div[2]/div[1]/input").is_displayed())
-        browser.find_element_by_xpath("/html/body/div[2]/div[2]/div[2]/div[2]/div[1]/input").send_keys(self.name)
-        browser.find_element_by_xpath("/html/body/div[2]/div[2]/div[2]/div[2]/div[2]/input").send_keys(self.password)
-        browser.find_element_by_xpath("/html/body/div[2]/div[2]/div[2]/div[2]/div[3]/button").click()
+        WebDriverWait(browser, 10).until(lambda the_driver: the_driver.find_element_by_xpath("/html/body/div[2]/div[2]/div[2]/div[1]/div[1]/input").is_displayed())
+
+        browser.find_element_by_css_selector("body > div.container > div.content.animate-view.ng-scope > div.sec-panel.box-container.ng-scope > div.sec-panel-content.box-content > div.field.first > input").send_keys(self.name)
+        browser.find_element_by_css_selector("body > div.container > div.content.animate-view.ng-scope > div.sec-panel.box-container.ng-scope > div.sec-panel-content.box-content > div:nth-child(3) > input").send_keys(self.password)
+        browser.find_element_by_css_selector("body > div.container > div.content.animate-view.ng-scope > div.sec-panel.box-container.ng-scope > div.sec-panel-content.box-content > div:nth-child(5) > button").click()
 
         #begin to check work
         WebDriverWait(browser, 10).until(lambda the_driver: the_driver.find_element_by_xpath("/html/body/div[4]/div[2]/div[1]/div[3]/button/span").is_displayed())
         browser.find_element_by_xpath("/html/body/div[4]/div[2]/div[1]/div[3]/button/span").click()
-
         #check
         finished_task_num = 0
-
         while finished_task_num < self.task_limit_number:
             time.sleep(2)# wait for server pushing new order
             try:
