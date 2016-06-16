@@ -20,7 +20,13 @@ class Witkeyuser(threading.Thread):
         # browser = webdriver.Chrome(chromedriver)
 
         # firefox
-        browser = webdriver.Firefox()
+        # browser = webdriver.Firefox()
+
+        # phantom
+        phantomjsdriver = os.getcwd()+"\phantomjs.exe"
+        os.environ["webdriver.phantomjs.driver"] = phantomjsdriver
+        browser = webdriver.PhantomJS(phantomjsdriver)
+
         browser.get("http://172.16.8.7:4031/")
         # browser.get("http://witkey.iclassedu.com/#/")
         #go to login page
