@@ -20,9 +20,10 @@ class toraw:
                             '\6': r'\6',
                             '\7': r'\7',
                             '\8': r'\8',
-                            '\9': r'\9'
+                            '\9': r'\9',
+                            '\201': r'\201'
                             }
-    # '\201': r'\201'
+
 
     def _raw(self, text):  # 将每个可能的转义字符都进行了替换
         """Returns a raw string representation of text"""

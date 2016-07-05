@@ -1,15 +1,16 @@
-# encoding: utf-8
+# encoding: gbk
 import os
 
 class Parsependata:
     def __init__(self, path):
         self.path = path
+    os.sep = "/"
 
-    # zip鍖呯殑璺緞锛宻tuId锛宭icense
+    # zip包的路径，stuId，license
     def getPaperDataInfo(self):
         pendataInfo = []
         for root, sub_dirs, files in os.walk(self.path):
-            if len(files) and (root.find("null") == -1) and (root.find("缁冧範") == -1):
+            if len(files) and (root.find("null") == -1) and (root.find(r"练习") == -1) and (root.find(r"作业") == -1):
                 zipPath = root
                 stuId = root[root.find("STU"):]
                 licenses =[]

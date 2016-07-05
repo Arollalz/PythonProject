@@ -7,8 +7,15 @@ from PrepareDataForCreatingExamination import gl
 
 # STEP_01
 # 解析线上下载下来的PenData数据，获得每份笔迹的信息：zip包的路径，StuId，License
-myParser = Parsependata("D:\PenData")
+myParser = Parsependata("D:\PenData\PenData1")
 gl.paperDataInfo = myParser.getPaperDataInfo()
+
+csvPaperDataInfo = file("paperDataInfo.csv", "wb")
+
+paperDataInfoWriter = csv.writer(csvPaperDataInfo)
+for e in gl.paperDataInfo:
+    paperDataInfoWriter.writerow([e[0], e[1], e[2]])
+csvPaperDataInfo.close()
 
 # STEP_02
 # 通过查询MySQL
@@ -21,12 +28,19 @@ mySqlHandler = MySqlHandler(gl.paperDataInfo)
 gl.result = mySqlHandler.getResult1()
 
 
+
 # STEP_03
 # 将TeacherLoginName,ClassId,PaperId,StartTime,EndTime,ExamName写入csv格式的文件中
 csvFile = file("DataForCreatingExamination.csv", "wb")
 writer = csv.writer(csvFile)
 twoHoursAgo = time.time() - 2 * 60 * 60
 print time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(twoHoursAgo))
+
+csvCreateTime = file("CreateTime.csv", "wb")
+writerCreateTime = csv.writer(csvCreateTime)
+writerCreateTime.writerow([time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))])
+csvCreateTime.close()
+
 gl.createtime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))
 examNamePrefix = "LZ_PERFORMANCE_"
 i = 0

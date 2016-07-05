@@ -4,6 +4,28 @@ from PrepareDataForCreatingExamination.sqlHandler import MySqlHandler
 import hashlib
 import csv
 from stringtorawstring import toraw
+import os
+
+# write data to gl
+# result = []
+# paperDataInfo = []
+# createtime = []
+
+def _readFileAndPutIntoGlVar(URL, Var):
+    f = open(os.getcwd()+URL, "r")
+    while True:
+        line = f.readline()
+        if line:
+            Var.append(line.split(","))
+        else:
+            break
+    f.close()
+
+
+_readFileAndPutIntoGlVar("\DataForCreatingExamination.csv", gl.result)
+_readFileAndPutIntoGlVar("\paperDataInfo.csv", gl.paperDataInfo)
+_readFileAndPutIntoGlVar("\CreateTime.csv", gl.createtime)
+
 
 # STEP_04
 # 得到学生上传时需要的数据，stuLoginName, studentId, penSerialnumber, examId, MD5, zip包的个数
@@ -39,3 +61,4 @@ for e in result:
     writer.writerow([e[0], e[4], e[1], e[2], m.hexdigest(), len(e[5]), e[3]])
     i += 1
 csvFile.close()
+

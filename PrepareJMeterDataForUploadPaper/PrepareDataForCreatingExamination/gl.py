@@ -1,4 +1,4 @@
 
-result = None
-paperDataInfo = None
-createtime = None
+result = []
+paperDataInfo = []
+createtime = []
