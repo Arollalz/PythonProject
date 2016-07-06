@@ -24,5 +24,5 @@ def _readFileAndPutIntoGlVar(URL, Var):
         else:
             break
     f.close()
-_readFileAndPutIntoGlVar("\DataForCreatingExamination.csv", gl.result)
-print gl.result
+_readFileAndPutIntoGlVar("\CreateTime.csv", gl.createtime)
+print gl.createtime[0][0]

@@ -4,10 +4,11 @@ from PrepareDataForCreatingExamination.sqlHandler import MySqlHandler
 import csv
 import time
 from PrepareDataForCreatingExamination import gl
+import config
 
 # STEP_01
 # 解析线上下载下来的PenData数据，获得每份笔迹的信息：zip包的路径，StuId，License
-myParser = Parsependata("D:\PenData\PenData1")
+myParser = Parsependata(config.PENFILE)
 gl.paperDataInfo = myParser.getPaperDataInfo()
 
 csvPaperDataInfo = file("paperDataInfo.csv", "wb")

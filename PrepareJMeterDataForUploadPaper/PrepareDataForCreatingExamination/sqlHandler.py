@@ -1,19 +1,38 @@
 # coding=utf-8
 import MySQLdb
 import gl
+import config
+import os
+
 
 
 class MySqlHandler:
     def __init__(self, data1):
         self.paperDataInfo = data1
 
+    def _readFileAndPutIntoGlVar(self,URL, Var):
+        f = open(os.getcwd() + URL, "r")
+        while True:
+            line = f.readline()
+            if line:
+                if line.find(",") != -1:
+                    Var.append(line.split(","))
+                else:
+                    print "-----"
+                    Var.append(line)
+            else:
+                break
+        f.close()
+
+
+
     def getResult1(self):
         conn = MySQLdb.connect(
-            host='172.16.8.11',
-            port=3306,
-            user='admin',
-            passwd='123456',
-            db='smartmatch'
+            host = '172.16.8.7',
+            port = 3306,
+            user = 'root',
+            passwd = '123456',
+            db = 'smartmatch_syn'
         )
 
         cur = conn.cursor()
@@ -53,12 +72,13 @@ class MySqlHandler:
         return resultInfo
 
     def getResult2(self):
+        self._readFileAndPutIntoGlVar("\CreateTime.csv", gl.createtime)
         conn = MySQLdb.connect(
-            host='172.16.8.11',
-            port=3306,
-            user='admin',
-            passwd='123456',
-            db='smartmatch'
+            host = '172.16.8.7',
+            port = 3306,
+            user = 'root',
+            passwd = '123456',
+            db = 'smartmatch_syn'
         )
 
         cur = conn.cursor()
@@ -69,16 +89,41 @@ class MySqlHandler:
             JOIN edu_auth.account ON student.accountId = edu_auth.account.accountId
             JOIN penlicense_use ON penlicense_use.paperId = penuse.paperId
 		     JOIN examination ON penuse.paperId = examination.paperId
-            WHERE examination.examName LIKE "%LZ_PERFORMANCE_%" AND penlicense_use.license = (s%) AND penuse.createTime > (s%) AND student.studentId = (s%)"""
+            WHERE examination.examName LIKE (%s)  AND penlicense_use.license = (%s) AND penuse.createTime > (%s) AND student.studentId = (%s)"""
 
         #  self.paperDataInfo -> zip包的路径，StuId，License
         #  self.data2 -> TeacherLoginName，ClassId，PaperId
         resultInfo = []
         for e in self.paperDataInfo:
-            queryResult = cur.execute(query, [(e[2]),(gl.createtime),(e[1])])
+            # print e
+            # print e[0]
+            # print e[1]
+            tempArray = []
+            tempStr = e[2:]
+            for e0 in tempStr:
+                tempArray.append(e0[e0.find("\'")+1:e0.rfind("\'")])
+            # print "tempArray", tempArray #TEST
+            # print e[3][1:]
+            # print e[4][1:-3]
+            # print gl.createtime[0]
+            myVars = []
+            likePartern = "%"+"LZ_PERFORMANCE_"+"%"
+            myVars.append(likePartern)
+            if len(e) == 3:
+                myVars.append((e[2][2:-3]))
+            else:
+                myVars.append((e[2][3:-1]))
+            myVars.append((gl.createtime[0][0:-1]))
+            myVars.append((e[1]))
+            print myVars
+            queryResult = cur.execute(query, myVars)
             result = cur.fetchmany(queryResult)
-            #edu_auth.account.loginName, pen.serialNum, penuse.examId,zip包的路径，StuId, Lincense
-            resultInfo.append((result[0], result[1], result[2], e[0], e[1], e[2]))
+            print result
+            #0.edu_auth.account.loginName,1. pen.serialNum, 2.penuse.examId,zip包的路径，3.StuId, Lincense
+            try:
+                resultInfo.append((result[0][0], result[0][1], result[0][2], e[0], e[1], tempArray))
+            except IndexError:
+                continue
         # for e2 in resultInfo:
         #     i += 1
         #     print e2

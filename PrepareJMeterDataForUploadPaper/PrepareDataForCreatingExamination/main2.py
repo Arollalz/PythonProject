@@ -1,4 +1,4 @@
-# encoding: utf-8
+# encoding: gbk
 import gl
 from PrepareDataForCreatingExamination.sqlHandler import MySqlHandler
 import hashlib
@@ -16,7 +16,11 @@ def _readFileAndPutIntoGlVar(URL, Var):
     while True:
         line = f.readline()
         if line:
-            Var.append(line.split(","))
+            if line.find(",") != -1:
+                Var.append(line.split(","))
+            else:
+                print "-----"
+                Var.append(line)
         else:
             break
     f.close()
@@ -26,39 +30,50 @@ _readFileAndPutIntoGlVar("\DataForCreatingExamination.csv", gl.result)
 _readFileAndPutIntoGlVar("\paperDataInfo.csv", gl.paperDataInfo)
 _readFileAndPutIntoGlVar("\CreateTime.csv", gl.createtime)
 
-
+print gl.createtime
 # STEP_04
-# å¾—åˆ°å­¦ç”Ÿä¸Šä¼ æ—¶éœ€è¦çš„æ•°æ®ï¼ŒstuLoginName, studentId, penSerialnumber, examId, MD5, zipåŒ…çš„ä¸ªæ•°
-# stuLoginName <-- edu_auth.account æŸ¥è¡¨
+# µÃµ½Ñ§ÉúÉÏ´«Ê±ĞèÒªµÄÊı¾İ£¬stuLoginName, studentId, penSerialnumber, examId, MD5, zip°üµÄ¸öÊı
+# stuLoginName <-- edu_auth.account ²é±í
 # studentId <-- gl.paperDataInfo
-# penSerialnumber <-- æŸ¥è¡¨
-# examId <-- æŸ¥è¡¨ ç”¨examNameï¼ŒPaperId æŸ¥è¯¢ gl.result
-# MD5 <-- ç”¨hashlibç”Ÿæˆ éœ€è¦zipåŒ…è·¯å¾„ è½¬æ¢ä¸ºString ç„¶å
-# zipåŒ…ä¸ªæ•° <-- gl.paperDataInfoä¸­Licenseçš„é•¿åº¦
-# è”åˆæŸ¥è¯¢æ¶‰åŠçš„è¡¨  edu_auth.account, penuseï¼Œpen, student
+# penSerialnumber <-- ²é±í
+# examId <-- ²é±í ÓÃexamName£¬PaperId ²éÑ¯ gl.result
+# MD5 <-- ÓÃhashlibÉú³É ĞèÒªzip°üÂ·¾¶ ×ª»»ÎªString È»ºó
+# zip°ü¸öÊı <-- gl.paperDataInfoÖĞLicenseµÄ³¤¶È
+# ÁªºÏ²éÑ¯Éæ¼°µÄ±í  edu_auth.account, penuse£¬pen, student
 mySqlHandler = MySqlHandler(gl.paperDataInfo)
-# RESULT: 0.edu_auth.account.loginName, 1.pen.serialNum, 2.penuse.examId, 3.zipåŒ…çš„è·¯å¾„ï¼Œ4.StuIdï¼Œ5.License
+# RESULT: 0.edu_auth.account.loginName, 1.pen.serialNum, 2.penuse.examId, 3.zip°üµÄÂ·¾¶£¬4.StuId£¬5.License
 result = mySqlHandler.getResult2()
 
+# print "result:", result
 # STEP_05
-# ï¼ï¼ï¼ï¼å°†stuLoginName, studentId, penSerialnumber, examId, MD5, zipåŒ…çš„ä¸ªæ•°å†™å…¥csvæ ¼å¼çš„æ–‡ä»¶ä¸­, zipåŒ…è·¯å¾„
+# £¡£¡£¡£¡½«stuLoginName, studentId, penSerialnumber, examId, MD5, zip°üµÄ¸öÊıĞ´Èëcsv¸ñÊ½µÄÎÄ¼şÖĞ, zip°üÂ·¾¶, License
 csvFile = file("upload.csv", "wb")
-writer = csv.writer(csvFile)
+writer = csv.writer(csvFile, delimiter="|")
 
 mytoraw = toraw()
 
 i = 0
 for e in result:
-    path = mytoraw._raw(e[3])
-    try:
-        f = open(path.decode(
-            "utf-8").encode("gbk"), "rb")
-    except UnicodeDecodeError:
-        continue
-    myBytes = f.read()
-    m = hashlib.md5()
-    m.update(myBytes)
-    writer.writerow([e[0], e[4], e[1], e[2], m.hexdigest(), len(e[5]), e[3]])
+    md5s = []
+    pathes = []
+    for e0 in e[5]:
+        oldPath = e[3]+"\\" + e0 + ".zip"
+        # print "oldpath",oldPath
+        path = mytoraw._raw(oldPath)
+        print "path", path
+        try:
+            f = open(path, "rb")
+        except UnicodeDecodeError:
+            print "continue"
+            continue
+        myBytes = f.read()
+        m = hashlib.md5()
+        m.update(myBytes)
+        md5s.append(m.hexdigest())
+        pathes.append(path)
+
+    writer.writerow([e[0], e[4], e[1], e[2], ",".join(md5s), len(e[5]), ",".join(pathes), ",".join(e[5])])
     i += 1
+print i
 csvFile.close()
 
