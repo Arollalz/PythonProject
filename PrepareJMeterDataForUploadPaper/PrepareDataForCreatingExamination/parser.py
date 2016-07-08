@@ -31,8 +31,31 @@ class Parsependata:
 
         return pendataInfo
 
+    def getExerciseDataInfo(self):
+        exerciseDataInfo = []
+        for root, sub_dirs, files in os.walk(self.path):
+            if len(files) and (root.find("null") == -1) and (root.find(r"Á·Ï°") == -1) and (root.find(r"×÷Òµ") == -1):
+                break
+            else:
+                zipPath = root
+                stuId = root[root.find("STU"):]
+                licenses = []
+                for e in files:
+                    licenses.append(e[0:e.find(".zip")])
 
+                exerciseDataInfo.append([zipPath, stuId, licenses])
 
+        # TEST-start
+        num = 1
+        for e in exerciseDataInfo:
+            print num
+            print e[0]
+            print e[1]
+            print e[2]
+            num += 1
+        # TEST-end
+
+        return exerciseDataInfo
 
 
 

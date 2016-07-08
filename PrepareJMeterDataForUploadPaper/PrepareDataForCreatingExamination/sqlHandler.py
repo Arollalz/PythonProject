@@ -24,15 +24,24 @@ class MySqlHandler:
                 break
         f.close()
 
+    def getResult0(self):
+        conn = MySQLdb.connect(
+            host = '172.16.8.11',
+            port = 3306,
+            user = 'admin',
+            passwd = '123456',
+            db = 'smartmatch'
+        )
+        cur = conn.cursor()
 
 
     def getResult1(self):
         conn = MySQLdb.connect(
-            host = '172.16.8.7',
+            host = '172.16.8.11',
             port = 3306,
-            user = 'root',
+            user = 'admin',
             passwd = '123456',
-            db = 'smartmatch_syn'
+            db = 'smartmatch'
         )
 
         cur = conn.cursor()
@@ -74,22 +83,30 @@ class MySqlHandler:
     def getResult2(self):
         self._readFileAndPutIntoGlVar("\CreateTime.csv", gl.createtime)
         conn = MySQLdb.connect(
-            host = '172.16.8.7',
+            host = '172.16.8.11',
             port = 3306,
-            user = 'root',
+            user = 'admin',
             passwd = '123456',
-            db = 'smartmatch_syn'
+            db = 'smartmatch'
         )
 
         cur = conn.cursor()
 
+        # query = """SELECT DISTINCT edu_auth.account.loginName, pen.serialNum, penuse.examId
+        #     FROM  penuse JOIN pen ON penuse.studentId=pen.studentId
+        #     JOIN student ON student.studentId = penuse.studentId
+        #     JOIN edu_auth.account ON student.accountId = edu_auth.account.accountId
+        #     JOIN penlicense_use ON penlicense_use.paperId = penuse.paperId
+		 #     JOIN examination ON penuse.paperId = examination.paperId
+        #     WHERE examination.examName LIKE (%s)  AND penlicense_use.license = (%s) AND penuse.createTime > (%s) AND student.studentId = (%s)"""
+
         query = """SELECT DISTINCT edu_auth.account.loginName, pen.serialNum, penuse.examId
-            FROM  penuse JOIN pen ON penuse.studentId=pen.studentId
-            JOIN student ON student.studentId = penuse.studentId
-            JOIN edu_auth.account ON student.accountId = edu_auth.account.accountId
-            JOIN penlicense_use ON penlicense_use.paperId = penuse.paperId
-		     JOIN examination ON penuse.paperId = examination.paperId
-            WHERE examination.examName LIKE (%s)  AND penlicense_use.license = (%s) AND penuse.createTime > (%s) AND student.studentId = (%s)"""
+                    FROM  penuse JOIN pen ON penuse.studentId=pen.studentId
+                    JOIN student ON student.studentId = penuse.studentId
+                    JOIN edu_auth.account ON student.accountId = edu_auth.account.accountId
+                    JOIN penlicense_use ON penlicense_use.paperId = penuse.paperId
+        		     JOIN examination ON penuse.paperId = examination.paperId
+                    WHERE examination.examName LIKE (%s)  AND penlicense_use.license = (%s) AND penuse.createTime > (%s) AND student.studentId = (%s)"""
 
         #  self.paperDataInfo -> zip包的路径，StuId，License
         #  self.data2 -> TeacherLoginName，ClassId，PaperId
