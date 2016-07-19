@@ -10,7 +10,7 @@ class Parsependata:
     def getPaperDataInfo(self):
         pendataInfo = []
         for root, sub_dirs, files in os.walk(self.path):
-            if len(files) and (root.find("null") == -1) and (root.find(r"练习") == -1) and (root.find(r"作业") == -1):
+            if len(files) and (root.find("null") == -1) and (root.find(r"作业") == -1) and (root.find(r"练习") == -1):
                 zipPath = root
                 stuId = root[root.find("STU"):]
                 licenses =[]
@@ -34,9 +34,7 @@ class Parsependata:
     def getExerciseDataInfo(self):
         exerciseDataInfo = []
         for root, sub_dirs, files in os.walk(self.path):
-            if len(files) and (root.find("null") == -1) and (root.find(r"练习") == -1) and (root.find(r"作业") == -1):
-                break
-            else:
+            if len(files) and ((root.find("null") != -1) or (root.find(r"作业") != -1) or (root.find(r"练习") != -1)):
                 zipPath = root
                 stuId = root[root.find("STU"):]
                 licenses = []

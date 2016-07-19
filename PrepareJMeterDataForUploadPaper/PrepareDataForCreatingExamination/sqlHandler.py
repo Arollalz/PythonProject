@@ -1,4 +1,4 @@
-# coding=utf-8
+# encoding: gbk
 import MySQLdb
 import gl
 import config
@@ -7,8 +7,9 @@ import os
 
 
 class MySqlHandler:
-    def __init__(self, data1):
+    def __init__(self, data1=None, data2=None):
         self.paperDataInfo = data1
+        self.exerciseDataInfo = data2
 
     def _readFileAndPutIntoGlVar(self,URL, Var):
         f = open(os.getcwd() + URL, "r")
@@ -24,6 +25,8 @@ class MySqlHandler:
                 break
         f.close()
 
+    # loginname, studentid, serialnumber, examid1111, MD5, zipcount, datapath, licenses
+
     def getResult0(self):
         conn = MySQLdb.connect(
             host = '172.16.8.11',
@@ -33,6 +36,43 @@ class MySqlHandler:
             db = 'smartmatch'
         )
         cur = conn.cursor()
+        query = """SELECT DISTINCT edu_auth.account.loginName,pen.serialNum
+                FROM pen JOIN student ON pen.studentId = student.studentId
+                JOIN edu_auth.account ON student.accountId = edu_auth.account.accountId
+                WHERE student.studentId = (%s)"""
+        resultInfo = []
+        for e in self.exerciseDataInfo:
+            # print e
+            # print e[0]
+            # print e[1]
+            tempArray = []
+            tempStr = e[2:]
+            # print "====", tempStr[0]
+            tempArray = tempStr[0]
+            # for e0 in tempStr:
+            #     tempArray.append(e0[e0.find("\'") + 1:e0.rfind("\'")])
+            # print "tempArray", tempArray #TEST
+            # print e[3][1:]
+            # print e[4][1:-3]
+            # print gl.createtime[0]
+            queryResult = cur.execute(query, (e[1],))
+            result = cur.fetchmany(queryResult)
+            # print result
+            # 0.edu_auth.account.loginName,1. pen.serialNum, 2.penuse.examId,zip°üµÄÂ·¾¶£¬3.StuId, Lincense
+            try:
+                resultInfo.append((result[0][0], result[0][1], "", e[0], e[1], tempArray))
+            except IndexError:
+                continue
+        # i = 0
+        # for e2 in resultInfo:
+        #     i += 1
+        #     print e2
+        #
+        # print i
+        # print resultInfo
+        cur.close()
+        conn.close()
+        return resultInfo
 
 
     def getResult1(self):
@@ -51,7 +91,7 @@ class MySqlHandler:
         studentIds = []
         numOfStu = len(self.paperDataInfo)
         while numOfStu > 0:
-            stringWHERE += " OR (student.studentId = (%s) AND penlicense_use.license = (%s))"
+            stringWHERE += " OR (penlicense_use.paperType = 'exampaper' AND student.studentId = (%s) AND penlicense_use.license = (%s))"
             numOfStu -= 1
 
         for e1 in self.paperDataInfo:
@@ -108,8 +148,8 @@ class MySqlHandler:
         		     JOIN examination ON penuse.paperId = examination.paperId
                     WHERE examination.examName LIKE (%s)  AND penlicense_use.license = (%s) AND penuse.createTime > (%s) AND student.studentId = (%s)"""
 
-        #  self.paperDataInfo -> zipåŒ…çš„è·¯å¾„ï¼ŒStuIdï¼ŒLicense
-        #  self.data2 -> TeacherLoginNameï¼ŒClassIdï¼ŒPaperId
+        #  self.paperDataInfo -> zip°üµÄÂ·¾¶£¬StuId£¬License
+        #  self.data2 -> TeacherLoginName£¬ClassId£¬PaperId
         resultInfo = []
         for e in self.paperDataInfo:
             # print e
@@ -136,7 +176,7 @@ class MySqlHandler:
             queryResult = cur.execute(query, myVars)
             result = cur.fetchmany(queryResult)
             print result
-            #0.edu_auth.account.loginName,1. pen.serialNum, 2.penuse.examId,zipåŒ…çš„è·¯å¾„ï¼Œ3.StuId, Lincense
+            #0.edu_auth.account.loginName,1. pen.serialNum, 2.penuse.examId,zip°üµÄÂ·¾¶£¬3.StuId, Lincense
             try:
                 resultInfo.append((result[0][0], result[0][1], result[0][2], e[0], e[1], tempArray))
             except IndexError:

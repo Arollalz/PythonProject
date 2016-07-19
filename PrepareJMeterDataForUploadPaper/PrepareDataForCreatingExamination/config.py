@@ -22,5 +22,5 @@
 # DBNAME = 'smartmatch'
 
 # PENFILE
-PENFILE = "E:\PenData530_630"
+PENFILE = "D:\PenData\PenData0"
 
