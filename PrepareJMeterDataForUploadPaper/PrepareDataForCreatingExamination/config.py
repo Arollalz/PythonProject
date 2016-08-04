@@ -21,6 +21,6 @@
 # PASSWD = '123456',
 # DBNAME = 'smartmatch'
 
-# PENFILE
+# PENFILE  "E:\PenData530_630" "D:\PenData\PenData0"
 PENFILE = "D:\PenData\PenData0"
 

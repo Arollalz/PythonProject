@@ -29,7 +29,7 @@ class MySqlHandler:
 
     def getResult0(self):
         conn = MySQLdb.connect(
-            host = '172.16.8.11',
+            host = '172.16.6.20',
             port = 3306,
             user = 'admin',
             passwd = '123456',
@@ -77,7 +77,7 @@ class MySqlHandler:
 
     def getResult1(self):
         conn = MySQLdb.connect(
-            host = '172.16.8.11',
+            host = '172.16.6.20',
             port = 3306,
             user = 'admin',
             passwd = '123456',
@@ -95,6 +95,7 @@ class MySqlHandler:
             numOfStu -= 1
 
         for e1 in self.paperDataInfo:
+            print "students..."
             studentIds.append((e1[1]))
             studentIds.append((e1[2][0]))
 
@@ -123,7 +124,7 @@ class MySqlHandler:
     def getResult2(self):
         self._readFileAndPutIntoGlVar("\CreateTime.csv", gl.createtime)
         conn = MySQLdb.connect(
-            host = '172.16.8.11',
+            host = '172.16.6.20',
             port = 3306,
             user = 'admin',
             passwd = '123456',
@@ -139,14 +140,18 @@ class MySqlHandler:
         #     JOIN penlicense_use ON penlicense_use.paperId = penuse.paperId
 		 #     JOIN examination ON penuse.paperId = examination.paperId
         #     WHERE examination.examName LIKE (%s)  AND penlicense_use.license = (%s) AND penuse.createTime > (%s) AND student.studentId = (%s)"""
+        # query0 = """SELECT * FROM school
+        #         JOIN student ON school.schoolId = student.currSchoolId
+        #         WHERE school.`name` IN ("演示学校","2C测试学校","a1新建学校","魔法学校","部署测试","测试学校","111","11","聚云浩海","启航新课堂八年级下","天府前沿八年级下","天府前沿7年级下")
+        #         AND student.studentId = (%s);"""
 
         query = """SELECT DISTINCT edu_auth.account.loginName, pen.serialNum, penuse.examId
                     FROM  penuse JOIN pen ON penuse.studentId=pen.studentId
                     JOIN student ON student.studentId = penuse.studentId
                     JOIN edu_auth.account ON student.accountId = edu_auth.account.accountId
                     JOIN penlicense_use ON penlicense_use.paperId = penuse.paperId
-        		     JOIN examination ON penuse.paperId = examination.paperId
-                    WHERE examination.examName LIKE (%s)  AND penlicense_use.license = (%s) AND penuse.createTime > (%s) AND student.studentId = (%s)"""
+        		      JOIN examination ON penuse.examId = examination.examId
+                    WHERE penuse.service = 'exam' AND penuse.classId = student.currClassId AND examination.examName LIKE (%s)  AND penlicense_use.license = (%s) AND penuse.createTime > (%s) AND student.studentId = (%s)"""
 
         #  self.paperDataInfo -> zip包的路径，StuId，License
         #  self.data2 -> TeacherLoginName，ClassId，PaperId
@@ -164,7 +169,7 @@ class MySqlHandler:
             # print e[4][1:-3]
             # print gl.createtime[0]
             myVars = []
-            likePartern = "%"+"LZ_PERFORMANCE_"+"%"
+            likePartern = "PERFORMANCE"+"%"
             myVars.append(likePartern)
             if len(e) == 3:
                 myVars.append((e[2][2:-3]))
@@ -173,20 +178,32 @@ class MySqlHandler:
             myVars.append((gl.createtime[0][0:-1]))
             myVars.append((e[1]))
             print myVars
+
+            # query0Result = cur.execute(query0, ((e[1]),))
+            # result0 = cur.fetchmany(query0Result)
+            #
+            # if result0 != ():
+            #     print "=============", result0
+            #     break
+
             queryResult = cur.execute(query, myVars)
             result = cur.fetchmany(queryResult)
-            print result
-            #0.edu_auth.account.loginName,1. pen.serialNum, 2.penuse.examId,zip包的路径，3.StuId, Lincense
-            try:
-                resultInfo.append((result[0][0], result[0][1], result[0][2], e[0], e[1], tempArray))
-            except IndexError:
+            if result == ():
                 continue
+            else:
+                try:
+                    resultInfo.append((result[0][0], result[0][1], result[0][2], e[0], e[1], tempArray))
+                except IndexError:
+                    continue
+             # print result
+            #0.edu_auth.account.loginName,1. pen.serialNum, 2.penuse.examId,zip包的路径，3.StuId, Lincense
+
         # for e2 in resultInfo:
         #     i += 1
         #     print e2
 
         # print i
-        # print resultInfo
+        # print "============", len(resultInfo)
         cur.close()
         conn.close()
         return resultInfo

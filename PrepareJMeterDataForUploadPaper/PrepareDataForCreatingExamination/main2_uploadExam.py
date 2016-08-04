@@ -60,7 +60,7 @@ for e in result:
         oldPath = e[3]+"\\" + e0 + ".zip"
         # print "oldpath",oldPath
         path = mytoraw._raw(oldPath)
-        print "path", path
+        #print "path", path
         try:
             f = open(path, "rb")
         except UnicodeDecodeError:
@@ -71,7 +71,6 @@ for e in result:
         m.update(myBytes)
         md5s.append(m.hexdigest())
         pathes.append(path)
-
     writer.writerow([e[0], e[4], e[1], e[2], ",".join(md5s), len(e[5]), ",".join(pathes), ",".join(e[5])])
     i += 1
 print i
